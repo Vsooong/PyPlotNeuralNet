@@ -4,7 +4,8 @@ import os
 def to_head(projectpath):
     pathlayers = os.path.join(projectpath, 'layers/').replace('\\', '/')
     return r"""
-\documentclass[border=8pt, multi, tikz]{standalone} 
+\documentclass[border=8pt, multi, tikz,dvipsnames, svgnames, x11names]{standalone} 
+\usepackage{xcolor} 
 \usepackage{import}
 \subimport{""" + pathlayers + r"""}{init}
 \usetikzlibrary{positioning}
@@ -21,22 +22,7 @@ def to_cor():
 \def\FcColor{rgb:blue,5;red,2.5;white,5}
 \def\FcReluColor{rgb:blue,5;red,5;white,4}
 \def\SoftmaxColor{rgb:magenta,5;black,7}   
-\def\FcColor2{rgb:magenta,5;black,7}  
-"""
-
-
-def to_add(name, to, offset="(0,0,0)", opacity=0.4, caption=''):
-    return r"""
-\pic[shift={""" + offset + """}] at """ + to + """ 
-    {Ball={
-        name=""" + name + """,
-        caption=""" + caption + """,
-        fill=\SumColor,
-        opacity=""" + str(opacity) + """,
-        radius=2.5,
-        logo=$+$
-        }
-    };
+\def\SumColor{rgb:blue,5;green,15}
 """
 
 
@@ -66,13 +52,27 @@ def to_Conv(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width
 \pic[shift={""" + offset + """}] at """ + to + """ 
     {Box={
         name=""" + name + """,
-        caption=""" + caption + r""",
+        caption=""" + caption + """,
         xlabel={{""" + str(n_filer) + """, }},
         zlabel=""" + str(s_filer) + """,
         fill=\ConvColor,
         height=""" + str(height) + """,
         width=""" + str(width) + """,
         depth=""" + str(depth) + """
+        }
+    };
+"""
+
+
+def to_add(name, to, offset="(0,0,0)", opacity=0.6, radius=2.0):
+    return r"""
+\pic[shift={ """ + offset + """ }] at """ + "({}-east) ".format(to) + """ 
+    {Ball={
+        name=""" + name + """,
+        fill=\SumColor,
+        opacity=""" + str(opacity) + """,
+        radius=""" + str(radius) + """,
+        logo=$+$
         }
     };
 """
@@ -100,7 +100,7 @@ def to_ConvConvRelu(name, s_filer=256, n_filer=(64, 64), offset="(0,0,0)", to="(
 
 
 def to_ConvRelu(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=2, height=40, depth=40,
-                caption=" "):
+                caption=" ", fill_color='\\ConvColor'):
     return r"""
 \pic[shift={ """ + offset + """ }] at """ + to + """ 
     {RightBandedBox={
@@ -108,7 +108,7 @@ def to_ConvRelu(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", w
         caption=""" + caption + """,
         xlabel={{""" + str(n_filer) + """, }},
         zlabel=""" + str(s_filer) + """,
-        fill=\ConvColor,
+        fill=""" + fill_color + """,
         bandfill=\ConvReluColor,
         height=""" + str(height) + """,
         width=""" + str(width) + """,
@@ -173,7 +173,7 @@ def to_SoftMax(name, s_filer=10, offset="(0,0,0)", to="(0,0,0)", width=1.5, heig
 
 
 def to_FullyConnected(name, s_filer=" ", n_filer=" ", offset="(0,0,0)", to="(0,0,0)", width=1.5, height=3, depth=25,
-                      opacity=0.8, caption=" ", ):
+                      opacity=0.8, caption=" ", fill_color='\\FcColor'):
     return r"""
 \pic[shift={""" + offset + """}] at """ + to + """ 
     {Box={
@@ -181,7 +181,25 @@ def to_FullyConnected(name, s_filer=" ", n_filer=" ", offset="(0,0,0)", to="(0,0
         caption=""" + caption + """,
         xlabel={{ """ + '"' + str(n_filer) + '", "dummy"' + """ }},
         zlabel=""" + str(s_filer) + """,
-        fill=\FcColor,
+        fill=""" + fill_color + """,
+        opacity=""" + str(opacity) + """,
+        height=""" + str(height) + """,
+        width=""" + str(width) + """,
+        depth=""" + str(depth) + """
+        }
+    };
+"""
+def to_FcRelu(name, s_filer=" ", n_filer=" ", offset="(0,0,0)", to="(0,0,0)", width=3, height=3, depth=30,
+                      opacity=0.8, caption=" ", fill_color='\\FcColor'):
+    return r"""
+\pic[shift={ """ + offset + """ }] at """ + to + """ 
+    {RightBandedBox={
+        name=""" + name + """,
+        caption=""" + caption + """,
+        xlabel={{ """ + str(n_filer) + """, }},
+        zlabel=""" + str(s_filer) + r""",
+        fill=""" + fill_color + """,
+        bandfill=\FcReluColor,
         opacity=""" + str(opacity) + """,
         height=""" + str(height) + """,
         width=""" + str(width) + """,
@@ -190,9 +208,26 @@ def to_FullyConnected(name, s_filer=" ", n_filer=" ", offset="(0,0,0)", to="(0,0
     };
 """
 
-
+# def to_ConvRes(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=6, height=40, depth=40, opacity=0.2,
+#                caption=" "):
+#     return r"""
+# \pic[shift={ """ + offset + """ }] at """ + to + """
+#     {RightBandedBox={
+#         name=""" + name + """,
+#         caption=""" + caption + """,
+#         xlabel={{ """ + str(n_filer) + """, }},
+#         zlabel=""" + str(s_filer) + r""",
+#         fill={rgb:white,1;black,3},
+#         bandfill={rgb:white,1;black,2},
+#         opacity=""" + str(opacity) + """,
+#         height=""" + str(height) + """,
+#         width=""" + str(width) + """,
+#         depth=""" + str(depth) + """
+#         }
+#     };
+# """
 def to_ConvRes(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=6, height=40, depth=40, opacity=0.2,
-               caption=" "):
+               caption=" ", fill_color='\\ConvColor'):
     return r"""
 \pic[shift={ """ + offset + """ }] at """ + to + """ 
     {RightBandedBox={
@@ -200,8 +235,8 @@ def to_ConvRes(name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", wi
         caption=""" + caption + """,
         xlabel={{ """ + str(n_filer) + """, }},
         zlabel=""" + str(s_filer) + r""",
-        fill={rgb:white,1;black,3},
-        bandfill={rgb:white,1;black,2},
+        fill=""" + fill_color + """,
+        bandfill=\ConvReluColor,
         opacity=""" + str(opacity) + """,
         height=""" + str(height) + """,
         width=""" + str(width) + """,

@@ -72,10 +72,11 @@ def block_Unconv( name, botton, top, s_filer=256, n_filer=64, offset="(1,0,0)", 
             )
     ]
 
-def block_1Unconv( name, botton, top, s_filer=256, n_filer=64, offset="(1,0,0)", size=(32,32,3.5), opacity=0.5 ):
+def block_1Unconv( name, botton, top, s_filer=256, n_filer=64, offset="(1,0,0)", size=(32,32,3.5), opacity=0.5, fill_color='\\ConvColor' ):
     return [
         to_UnPool(  name='uppool_{}'.format(name),    offset=offset,    to="({}-east)".format(botton),         width=1,              height=size[0],       depth=size[1], opacity=opacity ),
-        to_ConvRes( name='{}'.format(top),   offset="(0,0,0)", to="(uppool_{}-east)".format(name),    s_filer=str(s_filer), n_filer=str(n_filer), width=size[2], height=size[0], depth=size[1], opacity=opacity ),
+        to_ConvRes( name='{}'.format(top),   offset="(0,0,0)", to="(uppool_{}-east)".format(name),    s_filer=str(s_filer), n_filer=str(n_filer),
+                    width=size[2], height=size[0], depth=size[1], opacity=opacity,fill_color=fill_color),
         # to_Conv(    name='ccr_{}'.format(top),       offset="(0,0,0)", to="(ccr_res_{}-east)".format(name),   s_filer=str(s_filer), n_filer=str(n_filer), width=size[2], height=size[0], depth=size[1] ),
         # to_ConvRes( name='ccr_res_c_{}'.format(name), offset="(0,0,0)", to="(ccr_{}-east)".format(name),       s_filer=str(s_filer), n_filer=str(n_filer), width=size[2], height=size[0], depth=size[1], opacity=opacity ),
         # to_Conv(    name='{}'.format(top),            offset="(0,0,0)", to="(ccr_res_c_{}-east)".format(name), s_filer=str(s_filer), n_filer=str(n_filer), width=size[2], height=size[0], depth=size[1] ),
